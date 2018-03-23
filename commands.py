@@ -186,24 +186,40 @@ def apply_identity(args):
         result_identity = None
         result_keyword = None
         result_path = None
+        result_weakness = None
 
         try:
             for identity in identities.sections():
                 identity_obj = identities[identity]
                 i = 1
+                while 'path' + str(i) in identity_obj:
+                    j = 0
+                    path = Path(identity_obj['path' + str(i)])
+                    if path == cwd:
+                        result_identity = identity_obj
+                        result_identity_key = identity[9:]
+                        result_path = identity_obj['path' + str(i)]
+                        result_weakness = None
+                        raise StopIteration
+                    else:
+                        if path in cwd.parents:
+                            weakness = cwd.parents.index(path)
+                            if result_weakness is None or result_weakness > weakness:
+                                result_identity = identity_obj
+                                result_identity_key = identity[9:]
+                                result_path = identity_obj['path' + str(i)]
+                                result_weakness = weakness
+                    i += 1
+            if result_identity is not None:
+                raise StopIteration
+            for identity in identities.sections():
+                identity_obj = identities[identity]
+                i = 1
                 while 'keyword' + str(i) in identity_obj:
                     if identity_obj['keyword' + str(i)] in str(cwd):
-                        result_identity_key = identity
                         result_identity = identity_obj
+                        result_identity_key = identity[9:]
                         result_keyword = identity_obj['keyword' + str(i)]
-                        raise StopIteration
-                    i += 1
-                i = 1
-                while 'path' + str(i) in identity_obj:
-                    if Path(identity_obj['path' + str(i)]) in cwd.parents:
-                        result_identity_key = identity
-                        result_identity = identity_obj
-                        result_path = identity_obj['path' + str(i)]
                         raise StopIteration
                     i += 1
         except StopIteration:
@@ -213,11 +229,11 @@ def apply_identity(args):
             print(Colors.red + "No automatic identity was found." + Colors.default)
             return 1
 
-        line = 'Selected ' + Colors.bold + result_identity_key[9:] + Colors.default + ' based on '
+        line = 'Selected ' + Colors.bold + result_identity_key + Colors.default + ' based on '
         if result_keyword is not None:
             line += 'keyword "%s".' % result_keyword
         elif result_path is not None:
-            line += 'path "%s".' % result_path
+            line += 'path "%s" with weakness %s.' % (result_path, result_weakness)
         print(line)
 
         identity_obj = result_identity

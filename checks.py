@@ -15,18 +15,34 @@ resultIdentity = None
 resultIdentityKey = None
 resultKeyword = None
 resultPath = None
+resultWeakness = None
 
 try:
     for identity in identities.sections():
         identity_obj = identities[identity]
         i = 1
         while 'path' + str(i) in identity_obj:
-            if Path(identity_obj['path' + str(i)]) in cwd.parents:
+            j = 0
+            path = Path(identity_obj['path' + str(i)])
+            if path == cwd:
                 resultIdentity = identity_obj
                 resultIdentityKey = identity[9:]
                 resultPath = identity_obj['path' + str(i)]
+                resultWeakness = None
                 raise StopIteration
+            else:
+                if path in cwd.parents:
+                    weakness = cwd.parents.index(path)
+                    if resultWeakness is None or resultWeakness > weakness:
+                        resultIdentity = identity_obj
+                        resultIdentityKey = identity[9:]
+                        resultPath = identity_obj['path' + str(i)]
+                        resultWeakness = weakness
             i += 1
+    if resultIdentity is not None:
+        raise StopIteration
+    for identity in identities.sections():
+        identity_obj = identities[identity]
         i = 1
         while 'keyword' + str(i) in identity_obj:
             if identity_obj['keyword' + str(i)] in str(cwd):
@@ -52,7 +68,7 @@ elif resultIdentity['name'] != git_config_user[0] or resultIdentity['email'] != 
     if resultKeyword is not None:
         line += ' by keyword "%s"' % resultKeyword
     elif resultPath is not None:
-        line += ' by path "%s"' % resultPath
+        line += ' by path "%s" with weakness %s' % (resultPath, resultWeakness)
     else:
         line += 'unknown'
     print(line)
