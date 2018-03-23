@@ -47,6 +47,27 @@ parser_remove = subparsers.add_parser('remove',
 parser_remove.set_defaults(func=commands.remove_identity)
 parser_remove.add_argument('identity', help='the unique ID of the identity to remove')
 
+parser_update = subparsers.add_parser('update',
+                                      help='change the settings of a known identity')
+parser_update.set_defaults(func=commands.update_identity)
+parser_update.add_argument('identity', help='the unique ID of the identity to update')
+parser_update.add_argument('--name',
+                           help='change the full name of this identity',
+                           default=None)
+parser_update.add_argument('--email',
+                           help='change the email address of this identity',
+                           default=None)
+parser_update.add_argument('-k', '--keywords',
+                           nargs='*',
+                           help='change the keywords used to choose this identity; can be multiple, '
+                                'supply no keywords after this command to clear keywords',
+                           default=None)
+parser_update.add_argument('-p', '--paths',
+                           nargs='*',
+                           help='change the paths used to choose this identity; can be multiple, '
+                                'supply no paths after this command to clear paths',
+                           default=None)
+
 parser_apply = subparsers.add_parser('apply',
                                      help='set the config to use the specified known identity')
 parser_apply.set_defaults(func=commands.apply_identity)

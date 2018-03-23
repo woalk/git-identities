@@ -59,9 +59,32 @@ def show_identity(args):
 
     identity_obj = identities['identity.' + identity]
     print('[%s] %s <%s>' % (identity, identity_obj['name'], identity_obj['email']))
+
+    print('\nKeywords:')
+    i = 1
+    while True:
+        key = 'keyword' + str(i)
+        if key not in identity_obj:
+            break
+        print(' - ' + identity_obj[key])
+        i += 1
+    if i == 1:
+        print(' (none)')
+
+    print('\nPaths:')
+    i = 1
+    while True:
+        key = 'path' + str(i)
+        if key not in identity_obj:
+            break
+        print(' - ' + identity_obj[key])
+        i += 1
+    if i == 1:
+        print(' (none)')
+
     if identity_obj['name'] == git_config_user[0] and \
             identity_obj['email'] == git_config_email[0]:
-        line = 'This is the ' + Colors.green + 'default' + Colors.default + ' identity in the current context.'
+        line = '\nThis is the ' + Colors.green + 'default' + Colors.default + ' identity in the current context.'
         if git_config_user[1] or git_config_email[1]:
             line += '\nIt is set ' + Colors.yellow + 'locally' + Colors.default + ' in the current repository.'
         else:
@@ -114,6 +137,40 @@ def remove_identity(args):
         return 1
 
     identities.remove_section('identity.' + args.identity)
+    with open(identities_file_path, 'w') as identities_file:
+        identities.write(identities_file)
+    return 0
+
+
+def update_identity(args):
+    identities = configparser.ConfigParser()
+    identities.read(identities_file_path)
+    identity = 'identity.' + args.identity
+    if not identities.has_section(identity):
+        print(Colors.red + "The specified identity ID doesn't exist." + Colors.default)
+        return 1
+
+    if args.name is not None:
+        identities.set(identity, 'name', args.name)
+    if args.email is not None:
+        identities.set(identity, 'email', args.email)
+    if args.keywords is not None:
+        i = 1
+        for keyword in args.keywords:
+            identities.set(identity, 'keyword' + str(i), keyword)
+            i += 1
+        while identities.has_option(identity, 'keyword' + str(i)):
+            identities.remove_option(identity, 'keyword' + str(i))
+            i += 1
+    if args.paths is not None:
+        i = 1
+        for path in args.paths:
+            identities.set(identity, 'path' + str(i), path)
+            i += 1
+        while identities.has_option(identity, 'path' + str(i)):
+            identities.remove_option(identity, 'path' + str(i))
+            i += 1
+
     with open(identities_file_path, 'w') as identities_file:
         identities.write(identities_file)
     return 0
