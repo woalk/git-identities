@@ -59,4 +59,5 @@ elif resultIdentity['name'] != git_config_user[0] or resultIdentity['email'] != 
     print('       Expected: %s <%s>' % (resultIdentity['name'], resultIdentity['email']))
     print('Committing with: %s <%s>' % (git_config_user[0], git_config_email[0]))
     print('\nIf you still want to commit, use\n   git commit --no-verify')
+    print('Or you can change identity with\n   git identity apply --auto')
     exit(1)

@@ -179,9 +179,58 @@ def update_identity(args):
 def apply_identity(args):
     identities = configparser.ConfigParser()
     identities.read(identities_file_path)
-    if not identities.has_section('identity.' + args.identity):
-        print(Colors.red + "The specified identity ID doesn't exist." + Colors.default)
-        return 1
+
+    if args.auto:
+        cwd = Path.cwd()
+        result_identity_key = None
+        result_identity = None
+        result_keyword = None
+        result_path = None
+
+        try:
+            for identity in identities.sections():
+                identity_obj = identities[identity]
+                i = 1
+                while 'keyword' + str(i) in identity_obj:
+                    if identity_obj['keyword' + str(i)] in str(cwd):
+                        result_identity_key = identity
+                        result_identity = identity_obj
+                        result_keyword = identity_obj['keyword' + str(i)]
+                        raise StopIteration
+                    i += 1
+                i = 1
+                while 'path' + str(i) in identity_obj:
+                    if Path(identity_obj['path' + str(i)]) in cwd.parents:
+                        result_identity_key = identity
+                        result_identity = identity_obj
+                        result_path = identity_obj['path' + str(i)]
+                        raise StopIteration
+                    i += 1
+        except StopIteration:
+            pass
+
+        if result_identity_key is None:
+            print(Colors.red + "No automatic identity was found." + Colors.default)
+            return 1
+
+        line = 'Selected ' + Colors.bold + result_identity_key[9:] + Colors.default + ' based on '
+        if result_keyword is not None:
+            line += 'keyword "%s".' % result_keyword
+        elif result_path is not None:
+            line += 'path "%s".' % result_path
+        print(line)
+
+        identity_obj = result_identity
+    else:
+        if args.identity is None:
+            print(Colors.red + 'error: the following arguments are required: identity or -a' + Colors.default)
+            return 2
+        else:
+            if not identities.has_section('identity.' + args.identity):
+                print(Colors.red + "The specified identity ID doesn't exist." + Colors.default)
+                return 1
+            else:
+                identity_obj = identities['identity.' + args.identity]
 
     if not args.local:
         git_config_user = git.config_get('user', 'name')
@@ -190,15 +239,14 @@ def apply_identity(args):
             print(Colors.yellow + 'Warning:' + Colors.default +
                   ' the current repo has a local identity config and will not use the new value.')
 
-    identity_obj = identities['identity.' + args.identity]
     result_n = git.config_set('user', 'name', identity_obj['name'], local=args.local)
     result_e = git.config_set('user', 'email', identity_obj['email'], local=args.local)
     if not result_e and not result_n:
-        return 5
+        return 11
     elif not result_e:  # and resultN
-        return 2
-    elif not result_n:  # and resultE
         return 3
+    elif not result_n:  # and resultE
+        return 5
     else:  # both True
         return 0
 

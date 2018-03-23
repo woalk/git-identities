@@ -71,7 +71,10 @@ parser_update.add_argument('-p', '--paths',
 parser_apply = subparsers.add_parser('apply',
                                      help='set the config to use the specified known identity')
 parser_apply.set_defaults(func=commands.apply_identity)
-parser_apply.add_argument('identity', help='the unique ID of the identity to apply')
+parser_apply.add_argument('identity',
+                          nargs='?',
+                          help='the unique ID of the identity to apply',
+                          default=None)
 parser_apply.add_argument('--global',
                           dest='local',
                           action='store_false',
@@ -81,6 +84,9 @@ parser_apply.add_argument('--local',
                           action='store_true',
                           required=False,
                           help="apply the identity locally for the current repo (default)")
+parser_apply.add_argument('-a', '--auto',
+                          action='store_true',
+                          help="apply the identity matching based on current context's keywords or path")
 
 parser_use_global = subparsers.add_parser('use-global',
                                           help='remove any local identity config to reset to the global identity')
