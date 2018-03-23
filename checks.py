@@ -20,19 +20,19 @@ try:
     for identity in identities.sections():
         identity_obj = identities[identity]
         i = 1
-        while 'keyword' + str(i) in identity_obj:
-            if identity_obj['keyword' + str(i)] in str(cwd):
-                resultIdentity = identity_obj
-                resultIdentityKey = identity[9:]
-                resultKeyword = identity_obj['keyword' + str(i)]
-                raise StopIteration
-            i += 1
-        i = 1
         while 'path' + str(i) in identity_obj:
             if Path(identity_obj['path' + str(i)]) in cwd.parents:
                 resultIdentity = identity_obj
                 resultIdentityKey = identity[9:]
                 resultPath = identity_obj['path' + str(i)]
+                raise StopIteration
+            i += 1
+        i = 1
+        while 'keyword' + str(i) in identity_obj:
+            if identity_obj['keyword' + str(i)] in str(cwd):
+                resultIdentity = identity_obj
+                resultIdentityKey = identity[9:]
+                resultKeyword = identity_obj['keyword' + str(i)]
                 raise StopIteration
             i += 1
 except StopIteration:
