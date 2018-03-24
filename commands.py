@@ -1,6 +1,7 @@
 from os.path import basename
 from colors import Colors
 from pathlib import Path
+from auto import find_identity
 import git
 import configparser
 
@@ -181,62 +182,19 @@ def apply_identity(args):
     identities.read(identities_file_path)
 
     if args.auto:
-        cwd = Path.cwd()
-        result_identity_key = None
-        result_identity = None
-        result_keyword = None
-        result_path = None
-        result_weakness = None
-
-        try:
-            for identity in identities.sections():
-                identity_obj = identities[identity]
-                i = 1
-                while 'path' + str(i) in identity_obj:
-                    j = 0
-                    path = Path(identity_obj['path' + str(i)])
-                    if path == cwd:
-                        result_identity = identity_obj
-                        result_identity_key = identity[9:]
-                        result_path = identity_obj['path' + str(i)]
-                        result_weakness = None
-                        raise StopIteration
-                    else:
-                        if path in cwd.parents:
-                            weakness = cwd.parents.index(path)
-                            if result_weakness is None or result_weakness > weakness:
-                                result_identity = identity_obj
-                                result_identity_key = identity[9:]
-                                result_path = identity_obj['path' + str(i)]
-                                result_weakness = weakness
-                    i += 1
-            if result_identity is not None:
-                raise StopIteration
-            for identity in identities.sections():
-                identity_obj = identities[identity]
-                i = 1
-                while 'keyword' + str(i) in identity_obj:
-                    if identity_obj['keyword' + str(i)] in str(cwd):
-                        result_identity = identity_obj
-                        result_identity_key = identity[9:]
-                        result_keyword = identity_obj['keyword' + str(i)]
-                        raise StopIteration
-                    i += 1
-        except StopIteration:
-            pass
-
-        if result_identity_key is None:
+        result = find_identity(Path.cwd(), identities)
+        if result.identity_key is None:
             print(Colors.red + "No automatic identity was found." + Colors.default)
             return 1
 
-        line = 'Selected ' + Colors.bold + result_identity_key + Colors.default + ' based on '
-        if result_keyword is not None:
-            line += 'keyword "%s".' % result_keyword
-        elif result_path is not None:
-            line += 'path "%s" with weakness %s.' % (result_path, result_weakness)
+        line = 'Selected ' + Colors.bold + result.identity_key + Colors.default + ' based on '
+        if result.keyword is not None:
+            line += 'keyword "%s".' % result.keyword
+        elif result.path is not None:
+            line += 'path "%s" with weakness %s.' % (result.path, result.weakness)
         print(line)
 
-        identity_obj = result_identity
+        identity_obj = result.identity
     else:
         if args.identity is None:
             print(Colors.red + 'error: the following arguments are required: identity or -a' + Colors.default)

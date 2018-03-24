@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from colors import Colors
+from auto import find_identity
 import git
 import configparser
 
@@ -11,48 +12,13 @@ identities = configparser.ConfigParser()
 identities.read(identities_file_path)
 
 cwd = Path.cwd()
-resultIdentity = None
-resultIdentityKey = None
-resultKeyword = None
-resultPath = None
-resultWeakness = None
+result = find_identity(cwd, identities)
 
-try:
-    for identity in identities.sections():
-        identity_obj = identities[identity]
-        i = 1
-        while 'path' + str(i) in identity_obj:
-            j = 0
-            path = Path(identity_obj['path' + str(i)])
-            if path == cwd:
-                resultIdentity = identity_obj
-                resultIdentityKey = identity[9:]
-                resultPath = identity_obj['path' + str(i)]
-                resultWeakness = None
-                raise StopIteration
-            else:
-                if path in cwd.parents:
-                    weakness = cwd.parents.index(path)
-                    if resultWeakness is None or resultWeakness > weakness:
-                        resultIdentity = identity_obj
-                        resultIdentityKey = identity[9:]
-                        resultPath = identity_obj['path' + str(i)]
-                        resultWeakness = weakness
-            i += 1
-    if resultIdentity is not None:
-        raise StopIteration
-    for identity in identities.sections():
-        identity_obj = identities[identity]
-        i = 1
-        while 'keyword' + str(i) in identity_obj:
-            if identity_obj['keyword' + str(i)] in str(cwd):
-                resultIdentity = identity_obj
-                resultIdentityKey = identity[9:]
-                resultKeyword = identity_obj['keyword' + str(i)]
-                raise StopIteration
-            i += 1
-except StopIteration:
-    pass
+resultIdentity = result.identity
+resultIdentityKey = result.identity_key
+resultKeyword = result.keyword
+resultPath = result.path
+resultWeakness = result.weakness
 
 git_config_user = git.config_get('user', 'name')
 git_config_email = git.config_get('user', 'email')
