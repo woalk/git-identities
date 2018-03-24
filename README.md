@@ -8,6 +8,8 @@ Git-Identities allows you to change your Git config's `user.name` and `user.emai
 easily and quickly from a database of known identities,
 and provides automatic setters and checks to assure you're never committing with the wrong config again.
 
+**This requires Git version `2.10+` to work correctly.**
+
 ## Usage
 
 ### Basics
