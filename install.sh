@@ -31,7 +31,9 @@ fi
 
 INSTALL_DIR="/usr/local/bin"
 
-echo -e "We will symlink the main binary into \e[1m${INSTALL_DIR}/\e[0mgit-identities\e[0m"
+echo "We will symlink the main binaries into"
+echo -e "- \e[1m${INSTALL_DIR}/\e[0mgit-identities\e[0m"
+echo -e "- \e[1m${INSTALL_DIR}/\e[0mgit-id-clone\e[0m"
 echo "Enter another directory path (in your PATH), or press [ENTER] to use the displayed path: "
 
 read INSTALL_DIR_OVERRIDE
@@ -77,6 +79,12 @@ ${PREFIX_CMD}ln -s "`pwd`/git_identities.py" "${INSTALL_DIR}/git-identities"
 if [ $? -ne 0 ]; then
     echo -e "\e[0;31mError:\e[0;39m Couldn't create symlink."
     exit 3
+fi
+
+${PREFIX_CMD}ln -s "`pwd`/clone.py" "${INSTALL_DIR}/git-id-clone"
+if [ $? -ne 0 ]; then
+    echo -e "\e[0;31mError:\e[0;39m Couldn't create symlink."
+    exit 5
 fi
 
 if [ -z "${CURRENT_HOOK_DIR}" ]; then
