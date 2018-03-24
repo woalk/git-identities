@@ -25,3 +25,8 @@ def config_unset(section, key, local=True):
     else:
         result = run(['git', 'config', '--global', '--unset', '%s.%s' % (section, key)], stdout=None, stderr=None)
     return result.returncode == 0
+
+
+def clone(url, args):
+    print(['git', 'clone'] + args + ['--', url])
+    return run(['git', 'clone'] + args + ['--', url])
