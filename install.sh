@@ -49,11 +49,11 @@ if [ ${NO_SUDO} -eq 1 ]; then
     GIT_CONFIG_COMMAND_SCOPE="--global"
 fi
 
-CURRENT_HOOK_DIR=`git config ${GIT_CONFIG_COMMAND_SCOPE} --get core.hooksDir`
+CURRENT_HOOK_DIR=`git config ${GIT_CONFIG_COMMAND_SCOPE} --get core.hooksPath`
 if [ ! -z "${CURRENT_HOOK_DIR}" ]; then
-    echo -e "\e[0;33mWarning:\e[0;39m You already have a ${GIT_CONFIG_SCOPE} Git config core.hooksDir."
+    echo -e "\e[0;33mWarning:\e[0;39m You already have a ${GIT_CONFIG_SCOPE} Git config core.hooksPath."
     echo "Please remove it with"
-    echo "   git config ${GIT_CONFIG_COMMAND_SCOPE} --unset core.hooksDir"
+    echo "   git config ${GIT_CONFIG_COMMAND_SCOPE} --unset core.hooksPath"
     echo "if you don't use it before proceeding."
     echo "If you do use it, either add"
     echo -e "   python3 \"`pwd`/hooks/checks.py\"\n   IDENTITY_RETURN=\$?\n   if [ \$IDENTITY_RETURN -ne 0 ]; then\n    exit \$IDENTITY_RETURN\n   fi"
@@ -63,7 +63,7 @@ if [ ! -z "${CURRENT_HOOK_DIR}" ]; then
     echo "Press [ENTER] to continue or ^C to cancel."
     read
 else
-    echo -e "We will set the ${GIT_CONFIG_SCOPE} Git config to have a \e[1mhooksDir\e[0m to \e[1m`pwd`/hooks\e[0m"
+    echo -e "We will set the ${GIT_CONFIG_SCOPE} Git config to have a \e[1mhooksPath\e[0m to \e[1m`pwd`/hooks\e[0m"
 fi
 
 PREFIX_CMD="sudo "
@@ -88,7 +88,7 @@ if [ $? -ne 0 ]; then
 fi
 
 if [ -z "${CURRENT_HOOK_DIR}" ]; then
-    ${PREFIX_CMD}git config ${GIT_CONFIG_COMMAND_SCOPE} core.hooksDir "`pwd`/hooks"
+    ${PREFIX_CMD}git config ${GIT_CONFIG_COMMAND_SCOPE} core.hooksPath "`pwd`/hooks"
     if [ $? -ne 0 ]; then
         echo -e "\e[0;31mError:\e[0;39m Couldn't change Git config."
         exit 4
