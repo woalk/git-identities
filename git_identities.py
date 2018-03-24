@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
+from os.path import basename
 import argparse
 import commands
+
+commands.set_command_name(basename(__file__))
 
 parser = argparse.ArgumentParser(epilog='Manage identities for Git commits.')
 subparsers = parser.add_subparsers(metavar='command',

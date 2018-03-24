@@ -1,4 +1,3 @@
-from os.path import basename
 from colors import Colors
 from pathlib import Path
 from auto import find_identity
@@ -6,6 +5,12 @@ import git
 import configparser
 
 identities_file_path = str(Path.home() / '.git_identities')
+command_name = None
+
+
+def set_command_name(name):
+    global command_name
+    command_name = name
 
 
 # subparsers 'command' functions
@@ -33,7 +38,7 @@ def list_identities(args):
             print(line)
     if identity_counter == 0:
         print(Colors.red + 'There are no saved identities.' + Colors.default)
-        print('\nUse\n   %s add ...\nto add a new identity.' % basename(__file__))
+        print('\nUse\n   %s add ...\nto add a new identity.' % command_name)
     return 0
 
 
@@ -53,9 +58,9 @@ def show_identity(args):
     if identity is None:
         print('[?] %s <%s>' % (git_config_user[0], git_config_email[0]))
         print(Colors.red +
-              'The identity in the current context is not known to %s.' % basename(__file__) +
+              'The identity in the current context is not known to %s.' % command_name +
               Colors.default)
-        print('You can add the current identity with\n   %s add --current' % basename(__file__))
+        print('You can add the current identity with\n   %s add --current' % command_name)
         return
 
     identity_obj = identities['identity.' + identity]
