@@ -22,7 +22,7 @@ path = Path.cwd() / name
 print(path)
 
 identities = configparser.ConfigParser()
-identities.read(identities_file_path)
+identities.read(identities_file_path, encoding='utf_8')
 
 result = find_identity(path, identities)
 if result.identity_key is None:

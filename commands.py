@@ -16,7 +16,7 @@ def set_command_name(name):
 # subparsers 'command' functions
 def list_identities(args):
     identities = configparser.ConfigParser()
-    identities.read(identities_file_path)
+    identities.read(identities_file_path, encoding='utf_8')
     identity_counter = 0
     for identity in identities.sections():
         if identity[:9] == 'identity.':
@@ -46,7 +46,7 @@ def show_identity(args):
     git_config_user = git.config_get('user', 'name')
     git_config_email = git.config_get('user', 'email')
     identities = configparser.ConfigParser()
-    identities.read(identities_file_path)
+    identities.read(identities_file_path, encoding='utf_8')
     identity = args.identity
     if identity is None:
         for identity_entry in identities.sections():
@@ -119,7 +119,7 @@ def add_identity(args):
             return 2
 
     identities = configparser.ConfigParser()
-    identities.read(identities_file_path)
+    identities.read(identities_file_path, encoding='utf_8')
     if not args.force and identities.has_section('identity.' + args.identity):
         print(Colors.red + 'The specified identity ID already exists.' + Colors.default)
         print('To replace the existing identity, specify --force.')
@@ -137,7 +137,7 @@ def add_identity(args):
 
 def remove_identity(args):
     identities = configparser.ConfigParser()
-    identities.read(identities_file_path)
+    identities.read(identities_file_path, encoding='utf_8')
     if not identities.has_section('identity.' + args.identity):
         print(Colors.red + "The specified identity ID doesn't exist." + Colors.default)
         return 1
@@ -150,7 +150,7 @@ def remove_identity(args):
 
 def update_identity(args):
     identities = configparser.ConfigParser()
-    identities.read(identities_file_path)
+    identities.read(identities_file_path, encoding='utf_8')
     identity = 'identity.' + args.identity
     if not identities.has_section(identity):
         print(Colors.red + "The specified identity ID doesn't exist." + Colors.default)
@@ -184,7 +184,7 @@ def update_identity(args):
 
 def apply_identity(args):
     identities = configparser.ConfigParser()
-    identities.read(identities_file_path)
+    identities.read(identities_file_path, encoding='utf_8')
 
     if args.auto:
         result = find_identity(Path.cwd(), identities)

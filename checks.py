@@ -9,7 +9,7 @@ import configparser
 identities_file_path = str(Path.home() / '.git_identities')
 
 identities = configparser.ConfigParser()
-identities.read(identities_file_path)
+identities.read(identities_file_path, encoding='utf_8')
 
 cwd = Path.cwd()
 result = find_identity(cwd, identities)

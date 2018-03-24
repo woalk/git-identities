@@ -1,12 +1,11 @@
-from subprocess import run, PIPE
+from subprocess import run, PIPE, DEVNULL
 
 
 # Returns a tuple (value, BOOL) whereas BOOL==True means that the config was fetched from the local .git/config
 def config_get(section, key):
     value = run(['git', 'config', '--get', '%s.%s' % (section, key)],
-                stdout=PIPE, stderr=None, universal_newlines=True).stdout[:-1]
-    local_result = run(['git', 'config', '--local', '--get', '%s.%s' % (section, key)],
-                       stdout=PIPE, universal_newlines=True)
+                stdout=PIPE, stderr=None, encoding='utf_8', universal_newlines=True).stdout[:-1]
+    local_result = run(['git', 'config', '--local', '--get', '%s.%s' % (section, key)], stdout=DEVNULL, stderr=None)
 
     return value, local_result.returncode == 0
 
